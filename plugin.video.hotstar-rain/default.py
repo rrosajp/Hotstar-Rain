@@ -228,38 +228,62 @@ def get_video_url():
     manifest1 = manifest1.replace('http://','https://')
     manifest1 = manifest1.replace('/z/','/i/')
     manifest1 = manifest1.replace('manifest.f4m', 'master.m3u8')
-	
-    manifest_url = make_request(manifest1)
-    if manifest_url:
-		if (quality=='highest'):
+    if (quality=='highest'):
+		manifest2 = manifest1.replace('1300,2000', '3000,4500')
+		manifest_url = make_request(manifest2)
+		if 'EXTM3U' in manifest_url:
 			matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
-		elif (quality == '720p'):
-			matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x720[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
-		elif (quality == '404p'):
-			matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x404[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+			manifest1 = None
+			if matchlist2:
+				for (size, video) in matchlist2:
+					if size:
+						size = int(size)
+					else:
+						size = 0
+					videos.append( [size, video] )
 		else:
-			matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x360[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
-		if matchlist2:
-			for (size, video) in matchlist2:
-				if size:
-					size = int(size)
-				else:
-					size = 0
-                videos.append( [size, video] )
-    else:
-        videos.append( [-2, match] )
-		
+			manifest1 = manifest2.replace('3000,4500', '1300,2000')
+    
+    if manifest1:
+		manifest_url = make_request(manifest1)
+		if manifest_url:
+			if (quality=='highest' or 'let me choose'):
+				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+			elif (quality == '720p'):
+				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x720[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+			elif (quality == '404p'):
+				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x404[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+			else:
+				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x360[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+			if matchlist2:
+				for (size, video) in matchlist2:
+					if size:
+						size = int(size)
+					else:
+						size = 0
+					videos.append( [size, video] )
+		else:
+			videos.append( [-2, match] )
+	
+    
     videos.sort(key=lambda L : L and L[0], reverse=True)
+    
     cookieString = ""
     c = s.cookies
     i = c.items()
     for name2, value in i:
 		cookieString+= name2 + "=" + value + ";"
-    raw3_start = videos[0][1]
-    high_video = raw3_start+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress
-    listitem =xbmcgui.ListItem(name)
-    xbmc.Player().play(high_video, listitem)
-    addDir('','','','')
+	
+    if (quality == 'let me choose'):
+		for video in videos:
+			size = '[' + str(video[0]) + '] '
+			addDir(0, size + name, video[1]+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, True)
+    else:
+		raw3_start = videos[0][1]
+		high_video = raw3_start+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress
+		listitem =xbmcgui.ListItem(name)
+		xbmc.Player().play(high_video, listitem)
+		addDir('','','','')
     
 		
 def addDir(mode,name,url,image,isplayable=False):

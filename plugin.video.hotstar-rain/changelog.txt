@@ -3,3 +3,8 @@
 
 -- [COLOR yellow][B]Release[/COLOR][/B]
 	- Do not forget to insert Indian IP address unless you're from India OR using Indian VPN
+
+[B][COLOR green]V 1.0.1 (Tuesday 06 October, 2015)[/COLOR][/B]
+
+-- [COLOR yellow][B]New functionality[/COLOR][/B]
+	- Added Highest[1080p if available] and 'Let me choose'(720p and lower) streaming option under settings.

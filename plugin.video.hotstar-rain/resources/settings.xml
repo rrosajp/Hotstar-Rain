@@ -3,7 +3,7 @@
 	<setting id="langType" type="labelenum" label="Select Language" values="Hindi|English|Kannada|Tamil|Telugu|Malayalam|Marathi|Bengali" default="Hindi"/>
 	<setting id="tvsortType" type="labelenum" label="TV Shows sorting by" values="Default|Name" default="Default" />
 	<setting id="moviessortType" type="labelenum" label="Movies sorting by" values="Name|Newest|Popularity" default="Newest" />
-	<setting id="qualityType" type="labelenum" label="Video Quality Selection" values="Highest|720p|404p|360p" default="720p"/>
+	<setting id="qualityType" type="labelenum" label="Video Quality Selection" values="[COLOR tomato]Highest[/COLOR]|[COLOR green]720p[/COLOR]|404p|360p|Let me Choose" default="720p"/>
 	<setting id="perPage" type="labelenum" label="Movies per Page" values="20|40|60" default="20" />
 	<setting label="any Indian IP address (http://bit.ly/1LhsHMX)" type="ipaddress" id="ipaddress" default="0.0.0.0"/>
 	</category>
