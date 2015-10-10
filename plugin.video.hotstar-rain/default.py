@@ -238,8 +238,9 @@ def get_video_url():
     if (quality=='highest'):
 		manifest2 = manifest1.replace('1300,2000', '3000,4500')
 		manifest_url = make_request(manifest2)
+		print manifest_url
 		if 'EXTM3U' in manifest_url:
-			matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+			matchlist2 = re.compile("BANDWIDTH=([0-9]+)[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
 			manifest1 = None
 			if matchlist2:
 				for (size, video) in matchlist2:
@@ -254,16 +255,15 @@ def get_video_url():
     if manifest1:
 		manifest_url = make_request(manifest1)
 		if manifest_url:
-			if (quality=='highest'):
-				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
-			elif (quality=='let me choose'):
-				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+			if (quality=='highest' or quality=='let me choose'):
+				# matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+				matchlist2 = re.compile("BANDWIDTH=([0-9]+)[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
 			elif (quality == '720p'):
-				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x720[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+				matchlist2 = re.compile("BANDWIDTH=(\d+).*x720[^\n]*\n([^n].*)").findall(str(manifest_url))
 			elif (quality == '404p'):
-				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x404[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+				matchlist2 = re.compile("BANDWIDTH=(\d+).*x404[^\n]*\n([^n].*)").findall(str(manifest_url))
 			else:
-				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x360[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+				matchlist2 = re.compile("BANDWIDTH=(\d+).*x360[^\n]*\n([^n].*)").findall(str(manifest_url))
 			if matchlist2:
 				for (size, video) in matchlist2:
 					if size:
@@ -273,10 +273,8 @@ def get_video_url():
 					videos.append( [size, video] )
 		else:
 			videos.append( [-2, match] )
-	
     
     videos.sort(key=lambda L : L and L[0], reverse=True)
-    
     cookieString = ""
     c = s.cookies
     i = c.items()
@@ -293,10 +291,7 @@ def get_video_url():
 		print 'high_video is: ',high_video
 		listitem =xbmcgui.ListItem(name)
 		listitem.setPath(high_video)
-		# listitem.setProperty('IsPlayable', 'true')
 		xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
-		# xbmc.Player().play(high_video, listitem)
-		# addDir('','','','')
     
 		
 def addDir(mode,name,url,image,isplayable=False):

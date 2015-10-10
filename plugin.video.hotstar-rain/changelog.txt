@@ -11,3 +11,6 @@
 
 [B][COLOR green]V 1.0.2 (Saturday 10 October, 2015)[/COLOR][/B]
 -- [COLOR yellow][B]Video[/COLOR][/B] Removed empty directory when stream is loaded, and rather keep existing directory.  Resuming should work now for movies, tvshows, and sports.  Please note, this update will pop up Inputstream errors due to the way addon is designed.  Don't be alarmed.
+
+[B][COLOR green]V 1.0.3 (Saturday 10 October, 2015)[/COLOR][/B]
+-- [COLOR yellow][B]Video Quality fixes[/COLOR][/B] Previous release 1.0.2 added quality bugs, this version should fix it.  Also, videos should load somewhat faster.
