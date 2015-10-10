@@ -29,6 +29,11 @@ elif moviessortType=='newest':
 	moviessortType='last_broadcast_date+desc,year+desc,title+asc'
 else:
 	moviessortType='counter+desc'
+	
+if (quality=='let me choose'):
+	fold = False
+else:
+	fold = True
 
 s=requests.Session()
 
@@ -69,11 +74,13 @@ def get_tvshows():
 
 def get_movies():
 	if url:
+		print 'url is: ', url
 		base_url = url
 		index = re.compile('Index=(\d*)').findall(str(base_url))[0]
 	else:
 		index = 0
 		base_url = 'http://search.hotstar.com/AVS/besc?action=SearchContents&channel=PCTV&maxResult='+perpage+'&moreFilters=language:'+language+'&query=*&searchOrder='+moviessortType+'&startIndex='+str(index)+'&type=MOVIE'
+		print 'base_url is:', base_url
 		
 	html = make_request(base_url)
 	data = html
@@ -83,7 +90,7 @@ def get_movies():
 		title = '[B][COLOR orange]'+result['contentTitle'].encode('ascii','ignore')+'[/COLOR][/B]       [B]['+str(datetime.timedelta(seconds=result['duration']))+'][/B]'
 		movie_link = 'http://www.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&type=VOD&id='+str(result['contentId'])
 		movie_img = ''#'http://media0-starag.startv.in/r1/thumbs/PCTV/31/'+result['urlPictures']+'/PCTV-'+result['urlPictures']+'-hs.jpg'
-		addDir(9,title, movie_link, movie_img, False)
+		addDir(9,title, movie_link, movie_img, fold)
 	index_page = int(index)+int(perpage)
 	if (index_page<=total):
 		index = index_page
@@ -126,7 +133,7 @@ def get_ss_event():
 			title = result['contentTitle']
 			event_link = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&id='+str(result['contentId'])+'&type=VOD'
 			event_img = ''
-			addDir(9, title, event_link, event_img, False)
+			addDir(9, title, event_link, event_img, fold)
 	else:
 		for result in html['resultObj']['categoryList'][0]['categoryList']:
 			title = result['contentTitle']
@@ -155,7 +162,7 @@ def col_movies():
 		title = '[B][COLOR orange]'+result['contentTitle'].encode('ascii','ignore')+'[/COLOR][/B]       [B]['+str(datetime.timedelta(seconds=result['duration']))+'][/B]'
 		colm_link = 'http://www.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&type=VOD&id='+str(result['contentId'])
 		colm_img = ''
-		addDir(9, title, colm_link, colm_img, False)
+		addDir(9, title, colm_link, colm_img, fold)
 		
 def get_search():
     if url:
@@ -175,7 +182,7 @@ def get_search():
 		title = '[B][COLOR blue]'+result['contentTitle'].encode('ascii','ignore')+'[/COLOR][/B] - '+result['language']+'-    [B]['+str(datetime.timedelta(seconds=result['duration']))+'][/B]'
 		search_link = 'http://www.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&type=VOD&id='+str(result['contentId'])
 		search_img = ''
-		addDir(9, title, search_link, search_img, False)
+		addDir(9, title, search_link, search_img, fold)
     			
     		
 def get_seasons():
@@ -214,7 +221,7 @@ def get_episodes():
 	for result in html['resultObj']['contentList']:
 		fin_ep_titles = str(result['episodeNumber'])+' - '+result['episodeTitle'].encode('ascii', 'ignore')
 		fin_ep_links = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&id='+str(result['contentId'])+'&type=VOD'
-		addDir(9, fin_ep_titles, fin_ep_links, '', False)
+		addDir(9, fin_ep_titles, fin_ep_links, '', fold)
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
 
@@ -247,7 +254,9 @@ def get_video_url():
     if manifest1:
 		manifest_url = make_request(manifest1)
 		if manifest_url:
-			if (quality=='highest' or 'let me choose'):
+			if (quality=='highest'):
+				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+			elif (quality=='let me choose'):
 				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
 			elif (quality == '720p'):
 				matchlist2 = re.compile("BANDWIDTH=([0-9]+).*x720[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
@@ -281,9 +290,13 @@ def get_video_url():
     else:
 		raw3_start = videos[0][1]
 		high_video = raw3_start+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress
+		print 'high_video is: ',high_video
 		listitem =xbmcgui.ListItem(name)
-		xbmc.Player().play(high_video, listitem)
-		addDir('','','','')
+		listitem.setPath(high_video)
+		# listitem.setProperty('IsPlayable', 'true')
+		xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
+		# xbmc.Player().play(high_video, listitem)
+		# addDir('','','','')
     
 		
 def addDir(mode,name,url,image,isplayable=False):
