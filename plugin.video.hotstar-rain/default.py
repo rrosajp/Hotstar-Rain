@@ -8,7 +8,6 @@ import xbmcplugin
 import xbmcgui
 import xbmcaddon
 from addon.common.addon import Addon
-import base64
 import datetime
 
 addon_id = 'plugin.video.hotstar-rain'
@@ -65,8 +64,9 @@ def get_tvshows():
 	html = json.loads(data)
 	for result in html['resultObj']['contentList']:
 		if language in result['language'].lower():
-			title = result['contentTitle'].encode('ascii', 'ignore') 
-			show_link = 'http://account.hotstar.com/AVS/besc?action=GetCatalogueTree&categoryId='+str(result['categoryId'])+'&channel=PCTV'
+			title = result['contentTitle'].encode('ascii', 'ignore')
+			# print 'title is', title
+			show_link = 'http://account.hotstar.com/AVS/besc?action=GetAggregatedContentDetails&channel=PCTV&contentId='+str(result['contentId'])#'http://account.hotstar.com/AVS/besc?action=GetCatalogueTree&categoryId='+str(result['contentId'])+'&channel=PCTV'
 			show_img = ''#http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-hs.jpg
 			addDir(6, title, show_link, show_img, False)
 		
@@ -92,7 +92,7 @@ def get_movies():
 		movie_img = ''#'http://media0-starag.startv.in/r1/thumbs/PCTV/31/'+result['urlPictures']+'/PCTV-'+result['urlPictures']+'-hs.jpg'
 		addDir(9,title, movie_link, movie_img, fold)
 	index_page = int(index)+int(perpage)
-	if (index_page<=total):
+	if (index_page<int(total)+1):
 		index = index_page
 		next = 'http://search.hotstar.com/AVS/besc?action=SearchContents&channel=PCTV&maxResult='+perpage+'&moreFilters=language:'+language+'&query=*&searchOrder='+moviessortType+'&startIndex='+str(index)+'&type=MOVIE'
 		addDir(3, '>>> Next Page >>>', next, '')
@@ -186,29 +186,31 @@ def get_search():
     			
     		
 def get_seasons():
+	#print url
 	html = make_request(url)
+	#print html
 	#data = html.decode('utf-8')
 	data = html
 	html = json.loads(data)
-	for result in html['resultObj']['categoryList']:
-		for result2 in result['categoryList']:
-			seasons = result2['categoryName']
-			season_link = 'http://account.hotstar.com/AVS/besc?action=GetAggregatedContentDetails&channel=PCTV&contentId='+str(result2['contentId'])
-			season_img = ''#'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result2['urlPictures'])+'/'+str(result2['urlPictures'])+'/PCTV-'+str(result2['urlPictures'])+'-hcc.jpg'
-			addDir(7, seasons, season_link, season_img, False)
+	for result in html['resultObj']['contentInfo']:
+		seasons = result['contentTitle']
+		season_link = 'http://account.hotstar.com/AVS/besc?action=GetCatalogueTree&categoryId='+str(result['categoryId'])+'&channel=PCTV'#'http://account.hotstar.com/AVS/besc?action=GetCatalogueTree&categoryId='++'&channel=PCTV'#			
+		season_img = ''#'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result2['urlPictures'])+'/'+str(result2['urlPictures'])+'/PCTV-'+str(result2['urlPictures'])+'-hcc.jpg'
+		addDir(7, seasons, season_link, season_img, False)
 			
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
 		
 def get_seasons_ep_links():
 	print "get seasons ep links: "+url
 	html = make_request(url)
-	#data = html.decode('utf-8')
 	data = html
 	html = json.loads(data)
-	for result in html['resultObj']['contentInfo']:
-		ep_titles = result['contentTitle'] +' - '+ result['description']
-		ep_links = 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId='+str(result['categoryId'])+'&channel=PCTV'
-		addDir(8, ep_titles, ep_links, '', False)
+	for result in html['resultObj']['categoryList']:
+		for result2 in result['categoryList']:
+			ep_titles = result2['categoryName']
+			ep_links = 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId='+str(result2['categoryId'])+'&channel=PCTV'			
+			# ep_links = 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId='+str(result['categoryList']['categoryId'])+'&channel=PCTV'
+			addDir(8, ep_titles, ep_links, '', False)
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
 		
@@ -219,7 +221,8 @@ def get_episodes():
 	data = html
 	html = json.loads(data)
 	for result in html['resultObj']['contentList']:
-		fin_ep_titles = str(result['episodeNumber'])+' - '+result['episodeTitle'].encode('ascii', 'ignore')
+		fin_ep_titles = str(result['episodeNumber'])+' - '+result['episodeTitle'].encode('ascii', 'ignore')		
+		# fin_ep_links = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&id='+str(result['contentId'])+'&type=VOD'
 		fin_ep_links = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&id='+str(result['contentId'])+'&type=VOD'
 		addDir(9, fin_ep_titles, fin_ep_links, '', fold)
 		
@@ -291,6 +294,7 @@ def get_video_url():
 		print 'high_video is: ',high_video
 		listitem =xbmcgui.ListItem(name)
 		listitem.setPath(high_video)
+		# xbmc.executebuiltin("PlayMedia(%s)"%high_video)
 		xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
     
 		
