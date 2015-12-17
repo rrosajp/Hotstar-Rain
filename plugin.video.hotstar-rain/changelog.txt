@@ -17,3 +17,6 @@
 
 [B][COLOR green]V 1.0.4 (Thursday 15 October, 2015)[/COLOR][/B]
 -- [COLOR yellow][B]Directory fixes[/COLOR][/B] Fixed next page error, and TV shows structure.
+
+[B][COLOR green]V 1.0.5 (Thursday 17 December, 2015)[/COLOR][/B]
+-- [COLOR yellow][B]website changes fix[/COLOR][/B] Fixed changes for website, sports should work again.
