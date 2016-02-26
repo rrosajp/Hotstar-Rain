@@ -43,7 +43,8 @@ def addon_log(string):
 def make_request(url):
     try:
 		headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding':'gzip, deflate, sdch', 'Connection':'keep-alive', 'User-Agent':'AppleCoreMedia/1.0.0.12B411 (iPhone; U; CPU OS 8_1 like Mac OS X; en_gb)', 'X-Forwarded-For': ipaddress}
-		response = s.get(url, headers=headers, cookies=s.cookies)
+		# print 'url to fetch', url
+		response = s.get(url, headers=headers, cookies=s.cookies, verify=False)
 		data = response.text
 		return data
     except urllib2.URLError, e:    # This is the correct syntax
@@ -81,16 +82,21 @@ def get_main_featured():
 	setView('movies', 'movie-view')
 	
 def get_tvshows():
-	html = make_request('http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId=817&channel=PCTV')
+	html = make_request('http://search.hotstar.com/AVS/besc?action=SearchContents&channel=PCTV&moreFilters=type:SERIES%3Blanguage:'+language+'%3B&query=*')
 	#data = html.decode('utf-8')
 	data = html
 	html = json.loads(data)
-	for result in html['resultObj']['contentList']:
-		if language in result['language'].lower():
-			title = result['contentTitle'].encode('ascii', 'ignore')
-			show_link = 'http://account.hotstar.com/AVS/besc?action=GetAggregatedContentDetails&channel=PCTV&contentId='+str(result['contentId'])
-			show_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-vl.jpg'
-			addDir(6, title, show_link, show_img, False)
+	for result in html['resultObj']['response']['docs']:
+		title = '[B][COLOR orange]'+result['contentTitle'].encode('ascii','ignore')+'[/COLOR][/B]'
+		season_link = 'http://account.hotstar.com/AVS/besc?action=GetAggregatedContentDetails&channel=PCTV&contentId='+str(result['contentId'])
+		show_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-vl.jpg'
+		addDir(6, title, season_link, show_img, False)
+	# for result in html['resultObj']['contentList']:
+		# if language in result['language'].lower():
+			# title = result['contentTitle'].encode('ascii', 'ignore')
+			# show_link = 'http://account.hotstar.com/AVS/besc?action=GetAggregatedContentDetails&channel=PCTV&contentId='+str(result['contentId'])
+			# show_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-vl.jpg'
+			# addDir(6, title, show_link, show_img, False)
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
 	setView('movies', 'movie-view')
@@ -261,11 +267,11 @@ def get_seasons_ep_links():
 		for result2 in result['categoryList']:
 			ep_titles = result2['categoryName']
 			ep_links = 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId='+str(result2['categoryId'])+'&channel=PCTV'
-			ep_images = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-vl.jpg'
+			ep_images = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result2['urlPictures'])[-2:]+'/'+str(result2['urlPictures'])+'/PCTV-'+str(result2['urlPictures'])+'-hsea.jpg'
 			addDir(8, ep_titles, ep_links, ep_images, False)
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
-	setView('movies', 'movie-view')	
+	setView('episodes', 'episode-view')	
 	
 def get_episodes():
 	print "get_episodes: "+url
@@ -277,16 +283,19 @@ def get_episodes():
 		fin_ep_titles = str(result['episodeNumber'])+' - '+result['episodeTitle'].encode('ascii', 'ignore')
 		duration = result['duration']
 		fin_ep_links = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&id='+str(result['contentId'])+'&type=VOD'
-		fin_ep_images = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-vl.jpg'
+		fin_ep_images = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-hs.jpg'
 		addDir(9, fin_ep_titles, fin_ep_links, fin_ep_images,duration, fold)
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
-	setView('movies', 'movie-view')
+	setView('episodes', 'episode-view')
 
 def get_video_url():
     videos = []
     params = []
     html = make_request(url)
+    # name = 'testing singham returns'
+    # if 'testing' in name:
+		# image = ''
     data = html
     html = json.loads(data)
     manifest1 = html['resultObj']['src']
@@ -345,7 +354,11 @@ def get_video_url():
 		for video in videos:
 			size = '[' + str(video[0]) + '] '
 			# print 'video 1 is', video[1]
-			addDir(0, size + name, video[1]+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, True)
+			# print 'size is', size
+			# print 'name is', name
+			# print 'ipaddress is', ipaddress
+			# print 'image is', image
+			addDir(0, size + name, video[1]+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, isplayable=True)
     else:
 		raw3_start = videos[0][1]
 		high_video = raw3_start+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress
@@ -358,6 +371,8 @@ def get_video_url():
 		# xbmc.Player().play(high_video, listitem)
 		# sys.exit()
 
+    setView('movies', 'movie-view')	
+		
 def setView(content, viewType):
         
     if content:

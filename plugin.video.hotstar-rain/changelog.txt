@@ -20,3 +20,6 @@
 
 [B][COLOR green]V 1.0.5 (Thursday 17 December, 2015)[/COLOR][/B]
 -- [COLOR yellow][B]website changes fix[/COLOR][/B] Fixed changes for website, sports should work again.
+
+[B][COLOR green]V 1.0.6 (Friday 26 February, 2016)[/COLOR][/B]
+-- [COLOR yellow][B]TV shows fix[/COLOR][/B] Fixed changes for website, missing TV shows should pull up.  added verify=False for requests
