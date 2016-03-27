@@ -18,8 +18,11 @@ debug = Addon.getSetting('debug')
 language = (Addon.getSetting('langType')).lower()
 perpage = (Addon.getSetting('perPage'))
 moviessortType = (Addon.getSetting('moviessortType')).lower()
+enableip = (Addon.getSetting('EnableIP'))
 ipaddress = (Addon.getSetting('ipaddress'))
 quality = (Addon.getSetting('qualityType')).lower()
+
+dialog = xbmcgui.Dialog()
 
 
 if moviessortType=='name':
@@ -42,8 +45,13 @@ def addon_log(string):
 
 def make_request(url):
     try:
-		headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding':'gzip, deflate, sdch', 'Connection':'keep-alive', 'User-Agent':'AppleCoreMedia/1.0.0.12B411 (iPhone; U; CPU OS 8_1 like Mac OS X; en_gb)', 'X-Forwarded-For': ipaddress}
+		print 'enableip is', enableip
+		if enableip=='true':
+			headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding':'gzip, deflate, sdch', 'Connection':'keep-alive', 'User-Agent':'AppleCoreMedia/1.0.0.12B411 (iPhone; U; CPU OS 8_1 like Mac OS X; en_gb)', 'X-Forwarded-For': ipaddress}
+		else:
+			headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding':'gzip, deflate, sdch', 'Connection':'keep-alive', 'User-Agent':'AppleCoreMedia/1.0.0.12B411 (iPhone; U; CPU OS 8_1 like Mac OS X; en_gb)'}
 		# print 'url to fetch', url
+		print 'headers are', headers
 		response = s.get(url, headers=headers, cookies=s.cookies, verify=False)
 		data = response.text
 		return data
@@ -213,7 +221,7 @@ def col_movies():
 	for result in html['resultObj']['contentList']:
 		title = '[B][COLOR orange]'+result['contentTitle'].encode('ascii','ignore')+'[/COLOR][/B]'
 		duration = result['duration']
-		colm_link = 'http://www.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&type=VOD&id='+str(result['contentId'])
+		colm_link = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&type=VOD&id='+str(result['contentId'])
 		colm_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+result['urlPictures']+'/PCTV-'+result['urlPictures']+'-vl.jpg'
 		addDir(9, title, colm_link, colm_img,duration, fold)
 		
@@ -288,7 +296,7 @@ def get_episodes():
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
 	setView('episodes', 'episode-view')
-
+	
 def get_video_url():
     videos = []
     params = []
@@ -358,18 +366,28 @@ def get_video_url():
 			# print 'name is', name
 			# print 'ipaddress is', ipaddress
 			# print 'image is', image
-			addDir(0, size + name, video[1]+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, isplayable=True)
+			if enableip=='true':
+				addDir(0, size + name, video[1]+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, isplayable=True)
+			else:
+				addDir(0, size + name, video[1]+"|Cookie="+cookieString, image, isplayable=True)
     else:
-		raw3_start = videos[0][1]
-		high_video = raw3_start+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress
-		print 'high_video is: ',high_video
-		listitem =xbmcgui.ListItem(name)
-		listitem.setProperty('mimetype', 'video/x-msvideo')
-		listitem.setPath(high_video)
-		# xbmc.executebuiltin("PlayMedia(%s)"%high_video)
-		xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
-		# xbmc.Player().play(high_video, listitem)
-		# sys.exit()
+		if videos:
+			raw3_start = videos[0][1]
+			if enableip=='true':
+				high_video = raw3_start+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress
+			else:
+				high_video = raw3_start+"|Cookie="+cookieString
+			print 'high_video is: ',high_video
+			listitem =xbmcgui.ListItem(name)
+			listitem.setProperty('mimetype', 'video/x-msvideo')
+			listitem.setPath(high_video)
+			# xbmc.executebuiltin("PlayMedia(%s)"%high_video)
+			xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
+			# xbmc.Player().play(high_video, listitem)
+			# sys.exit()
+		else:
+			movie_id = 'IP issue?'
+			dialog.notification("No Video Links available", movie_id, xbmcgui.NOTIFICATION_INFO, 4000)
 
     setView('movies', 'movie-view')	
 		

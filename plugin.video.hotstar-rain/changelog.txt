@@ -23,3 +23,6 @@
 
 [B][COLOR green]V 1.0.6 (Friday 26 February, 2016)[/COLOR][/B]
 -- [COLOR yellow][B]TV shows fix[/COLOR][/B] Fixed changes for website, missing TV shows should pull up.  added verify=False for requests
+
+[B][COLOR green]V 1.0.7 (Saturday 26 March, 2016)[/COLOR][/B]
+-- [COLOR yellow][B]ipaddress fix[/COLOR][/B] Fixed ipaddress dependency.  Also fixed movie collections video links.

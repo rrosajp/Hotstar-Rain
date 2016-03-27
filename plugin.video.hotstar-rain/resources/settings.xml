@@ -5,6 +5,8 @@
 	<setting id="moviessortType" type="labelenum" label="Movies sorting by" values="Name|Newest|Popularity" default="Newest" />
 	<setting id="qualityType" type="labelenum" label="Video Quality Selection" values="Highest|720p|404p|360p|Let me Choose" default="720p"/>
 	<setting id="perPage" type="labelenum" label="Movies per Page" values="20|40|60" default="20" />
-	<setting label="any Indian IP address (http://bit.ly/1LhsHMX)" type="ipaddress" id="ipaddress" default="0.0.0.0"/>
+	<setting id="EnableIP" type="bool" label="Enable Indian IP address?" default="false" />
+	<setting type="sep" />
+	<setting label="any Indian IP address (http://bit.ly/1LhsHMX)" type="ipaddress" enable="!eq(-2,false)" id="ipaddress" default="0.0.0.0"/>
 	</category>
 </settings>
