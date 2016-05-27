@@ -26,3 +26,6 @@
 
 [B][COLOR green]V 1.0.7 (Saturday 26 March, 2016)[/COLOR][/B]
 -- [COLOR yellow][B]ipaddress fix[/COLOR][/B] Fixed ipaddress dependency.  Also fixed movie collections video links.
+
+[B][COLOR green]V 1.0.8 (Saturday 27 May, 2016)[/COLOR][/B]
+-- [COLOR yellow][B]fixes[/COLOR][/B] Added 720p links for live sports streaming(if available - need to use let me choose option), and fixed subtitles integration with 3rd party services.

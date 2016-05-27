@@ -99,12 +99,6 @@ def get_tvshows():
 		season_link = 'http://account.hotstar.com/AVS/besc?action=GetAggregatedContentDetails&channel=PCTV&contentId='+str(result['contentId'])
 		show_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-vl.jpg'
 		addDir(6, title, season_link, show_img, False)
-	# for result in html['resultObj']['contentList']:
-		# if language in result['language'].lower():
-			# title = result['contentTitle'].encode('ascii', 'ignore')
-			# show_link = 'http://account.hotstar.com/AVS/besc?action=GetAggregatedContentDetails&channel=PCTV&contentId='+str(result['contentId'])
-			# show_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-vl.jpg'
-			# addDir(6, title, show_link, show_img, False)
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
 	setView('movies', 'movie-view')
@@ -284,7 +278,6 @@ def get_seasons_ep_links():
 def get_episodes():
 	print "get_episodes: "+url
 	html = make_request(url)
-	#data = html.decode('utf-8')
 	data = html
 	html = json.loads(data)
 	for result in html['resultObj']['contentList']:
@@ -301,9 +294,6 @@ def get_video_url():
     videos = []
     params = []
     html = make_request(url)
-    # name = 'testing singham returns'
-    # if 'testing' in name:
-		# image = ''
     data = html
     html = json.loads(data)
     manifest1 = html['resultObj']['src']
@@ -329,10 +319,11 @@ def get_video_url():
     
     if manifest1:
 		manifest_url = make_request(manifest1)
+		print manifest_url
 		if manifest_url:
 			if (quality=='highest' or quality=='let me choose'):
 				# matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
-				matchlist2 = re.compile("BANDWIDTH=([0-9]+)[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+				matchlist2 = re.compile("RESOLUTION=\d+x([0-9]+)[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
 			elif (quality == '720p'):
 				matchlist2 = re.compile("BANDWIDTH=(\d+).*x720[^\n]*\n([^n].*)").findall(str(manifest_url))
 			elif (quality == '404p'):
@@ -360,16 +351,27 @@ def get_video_url():
     if (quality == 'let me choose'):
 		print videos
 		for video in videos:
-			size = '[' + str(video[0]) + '] '
-			# print 'video 1 is', video[1]
-			# print 'size is', size
-			# print 'name is', name
-			# print 'ipaddress is', ipaddress
-			# print 'image is', image
+			size = '(' + str(video[0]) + 'p) '
 			if enableip=='true':
-				addDir(0, size + name, video[1]+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, isplayable=True)
+				if 'index_1364_av' in video[1]:
+					old_size = size
+					size = '(720p) '
+					old_vid = video[1]
+					new_vid = video[1].replace('index_1364_av', 'index_2064_av')
+					addDir(0, size + name, new_vid+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, isplayable=True)
+					addDir(0, old_size + name, old_vid+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, isplayable=True)
+				else:
+					addDir(0, size + name, video[1]+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, isplayable=True)
 			else:
-				addDir(0, size + name, video[1]+"|Cookie="+cookieString, image, isplayable=True)
+				if 'index_1364_av' in video[1]:
+					old_size = size
+					size = '[COLOR green][720p][/COLOR] '
+					old_vid = video[1]
+					new_vid = video[1].replace('index_1364_av', 'index_2064_av')
+					addDir(0, size + name, new_vid+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, isplayable=True)
+					addDir(0, old_size + name, old_vid+"|Cookie="+cookieString, image, isplayable=True)
+				else:
+					addDir(0, size + name, video[1]+"|Cookie="+cookieString, image, isplayable=True)
     else:
 		if videos:
 			raw3_start = videos[0][1]
@@ -379,12 +381,8 @@ def get_video_url():
 				high_video = raw3_start+"|Cookie="+cookieString
 			print 'high_video is: ',high_video
 			listitem =xbmcgui.ListItem(name)
-			listitem.setProperty('mimetype', 'video/x-msvideo')
 			listitem.setPath(high_video)
-			# xbmc.executebuiltin("PlayMedia(%s)"%high_video)
 			xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
-			# xbmc.Player().play(high_video, listitem)
-			# sys.exit()
 		else:
 			movie_id = 'IP issue?'
 			dialog.notification("No Video Links available", movie_id, xbmcgui.NOTIFICATION_INFO, 4000)
@@ -408,17 +406,24 @@ def setView(content, viewType):
 def addDir(mode,name,url,image,duration="",isplayable=False):
 	name = name.encode('utf-8', 'ignore')
 	url = url.encode('utf-8', 'ignore')
-	#image = image.encode('utf-8', 'ignore')
 
 	if 0==mode:
 		link = url
+		# if (quality == 'let me choose'):
+			# print 'name under adddir', name
+			# name = urllib.unquote_plus(name).split(']')[2].split('[')[0]
 		print link
 	else:
 		link = sys.argv[0]+"?mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&url="+urllib.quote_plus(url)+"&image="+urllib.quote_plus(image)
 
 	ok=True
 	item=xbmcgui.ListItem(name, iconImage="DefaultFolder.png", thumbnailImage=image)
-	item.setInfo( type="Video", infoLabels={ "Title": name, "Duration": duration } )
+	item.addStreamInfo('video', {'codec': 'h264'})
+	item.addStreamInfo('audio', {'codec': 'aac', 'language': 'en', 'channels': 2})
+	if 9==mode:
+		name = urllib.unquote_plus(name).split(']')[2].split('[')[0]
+	item.setInfo( type="Video", infoLabels={ "OriginalTitle": name, "Duration": duration } )
+	# print 'printing item', item
 	if 'vl.jpg' in image:
 		image2 = image.replace('vl.jpg', 'hl.jpg')
 		item.setArt({'fanart': image2})
