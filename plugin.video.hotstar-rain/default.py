@@ -269,6 +269,7 @@ def get_seasons_ep_links():
 		for result2 in result['categoryList']:
 			ep_titles = result2['categoryName']
 			ep_links = 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId='+str(result2['categoryId'])+'&channel=PCTV'
+			# ep_links = 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&appVersion=5.0.15&categoryId=423&channel=PCTV'
 			ep_images = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result2['urlPictures'])[-2:]+'/'+str(result2['urlPictures'])+'/PCTV-'+str(result2['urlPictures'])+'-hsea.jpg'
 			addDir(8, ep_titles, ep_links, ep_images, False)
 		
@@ -281,7 +282,7 @@ def get_episodes():
 	data = html
 	html = json.loads(data)
 	for result in html['resultObj']['contentList']:
-		fin_ep_titles = str(result['episodeNumber'])+' - '+result['episodeTitle'].encode('ascii', 'ignore')
+		fin_ep_titles = '[B][COLOR orange]'+str(result['episodeNumber'])+' - '+result['episodeTitle'].encode('ascii', 'ignore')+'[/COLOR][/B]'
 		duration = result['duration']
 		fin_ep_links = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&id='+str(result['contentId'])+'&type=VOD'
 		fin_ep_images = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-hs.jpg'
@@ -421,7 +422,8 @@ def addDir(mode,name,url,image,duration="",isplayable=False):
 	item.addStreamInfo('video', {'codec': 'h264'})
 	item.addStreamInfo('audio', {'codec': 'aac', 'language': 'en', 'channels': 2})
 	if 9==mode:
-		name = urllib.unquote_plus(name).split(']')[2].split('[')[0]
+		if '[' in name:
+			name = urllib.unquote_plus(name).split(']')[2].split('[')[0]
 	item.setInfo( type="Video", infoLabels={ "OriginalTitle": name, "Duration": duration } )
 	# print 'printing item', item
 	if 'vl.jpg' in image:
