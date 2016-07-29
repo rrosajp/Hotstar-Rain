@@ -65,8 +65,9 @@ def new_menu():
 	addDir(2, '[B][COLOR white]TV Shows[/COLOR][/B]', '', '','')
 	addDir(5, '[B][COLOR green]Movie Collections[/COLOR][/B]', '','', '')
 	addDir(24, '[B]Sports[/B]', '', '','')
+	addDir(31, '[B][COLOR yellow]TV Channels[/COLOR][/B]','','','')
 	addDir(12, '[B]Search[/B]', '', '','')
-	addDir(30, '[B][COLOR red]Old look (deprecated)[/COLOR][/B]', '','', '')
+	# addDir(30, '[B][COLOR red]Old look (deprecated)[/COLOR][/B]', '','', '')
 	
 def get_menu():
 	addDir(3, '[B][COLOR orange]Movies[/COLOR](old look)[/B]', '', '','')        
@@ -88,6 +89,35 @@ def get_main_featured():
 	
 	# setView('episodes', 'episode-view')
 	setView('movies', 'movie-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
+	
+def get_channels():
+	html = make_request('http://account.hotstar.com/AVS/besc?action=GetCatalogueTree&appVersion=5.0.21&categoryId=564&channel=PCTV')
+	data = html
+	html = json.loads(data)
+	for result in html['resultObj']['categoryList'][0]['categoryList']:
+			title = '[B][COLOR orange]'+result['contentTitle'].encode('ascii','ignore')+'[/COLOR][/B]'
+			channel_link = 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId='+str(result['categoryId'])+'&channel=PCTV'
+			channel_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-vl.jpg'
+			addDir(32, title, channel_link, channel_img, False)
+			
+	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
+	setView('movies', 'movie-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
+			
+def get_channel_shows():
+	html = make_request(url)
+	data=html
+	html=json.loads(data)
+	for result in html['resultObj']['contentList']:
+			title = '[B][COLOR orange]'+result['contentTitle'].encode('ascii','ignore')+'[/COLOR][/B]'
+			season_link = 'http://account.hotstar.com/AVS/besc?action=GetAggregatedContentDetails&channel=PCTV&contentId='+str(result['contentId'])
+			show_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-vl.jpg'
+			addDir(6, title, season_link, show_img, False)
+			
+	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
+	setView('movies', 'movie-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)		
 	
 def get_tvshows():
 	html = make_request('http://search.hotstar.com/AVS/besc?action=SearchContents&channel=PCTV&moreFilters=type:SERIES%3Blanguage:'+language+'%3B&query=*')
@@ -102,6 +132,7 @@ def get_tvshows():
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
 	setView('movies', 'movie-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
 	
 def get_movies():
 	if url:
@@ -130,6 +161,7 @@ def get_movies():
 		addDir(3, '>>> Next Page >>>', next, '')
 		
 	setView('movies', 'movie-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
 
 def get_sports():
 	html = make_request('http://account.hotstar.com/AVS/besc?action=GetCatalogueTree&categoryId=1678&channel=PCTV')
@@ -143,6 +175,7 @@ def get_sports():
 		sports_link = 'http://account.hotstar.com/AVS/besc?action=GetCatalogueTree&categoryId='+str(result['categoryId'])+'&channel=PCTV'
 		sports_img = ''#'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-hs.jpg'
 		addDir(13, title, sports_link, sports_img, False)
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
 		
 def get_new_sports():
 	html = make_request('http://account.hotstar.com/AVS/besc?action=GetCatalogueTree&categoryId=5962&channel=PCTV')
@@ -158,7 +191,8 @@ def get_new_sports():
 				sports_link = 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId='+str(result['categoryId'])+'&channel=PCTV'
 				sports_img = ''
 				addDir(14, title, sports_link, sports_img, False)
-			
+	
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)		
 		
 def get_ss():
 	html = make_request(url)
@@ -173,6 +207,7 @@ def get_ss():
 		ss_img = ''
 		addDir(14, title, ss_link, ss_img, False)
 	
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
 def get_ss_event():
 	# print 'ss url', url
 	html = make_request(url)
@@ -193,6 +228,7 @@ def get_ss_event():
 			addDir(14, title, event_link, event_img, False)
 	
 	setView('episodes', 'episode-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
 	
 def get_collections():
 	html = make_request('http://account.hotstar.com/AVS/besc?action=GetCatalogueTree&categoryId=558&channel=PCTV')
@@ -206,7 +242,7 @@ def get_collections():
 				col_img='http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+str(result['urlPictures'])+'/PCTV-'+str(result['urlPictures'])+'-hs.jpg'
 				addDir(10, title, col_link, col_img, False)
 
-
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
 				
 def col_movies():
 	html = make_request(url)
@@ -220,6 +256,7 @@ def col_movies():
 		addDir(9, title, colm_link, colm_img,duration, fold)
 		
 	setView('movies', 'movie-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
 		
 def get_search():
     if url:
@@ -229,6 +266,11 @@ def get_search():
         keyb.doModal()
         if (keyb.isConfirmed()):
             search_term = urllib.quote_plus(keyb.getText())
+            if not search_term:
+                addon.show_ok_dialog(['empty search not allowed'.title()], addon.get_name())
+                sys.exit()			
+        else:
+            sys.exit()			
 			
         search_url = 'http://search.hotstar.com/AVS/besc?action=SearchContents&channel=PCTV&facets=type%3Blanguage%3Bgenre&maxResult=34&query='+str(search_term)+'&startIndex=0&type=MOVIE,SERIES,SPORT,SPORT_LIVE'
 	
@@ -238,11 +280,12 @@ def get_search():
     for result in html['resultObj']['response']['docs']:
 		title = '[B][COLOR blue]'+result['contentTitle'].encode('ascii','ignore')+'[/COLOR][/B] - '+result['language']
 		duration = result['duration']
-		search_link = 'http://www.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&type=VOD&id='+str(result['contentId'])
+		search_link = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&type=VOD&id='+str(result['contentId'])
 		search_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+result['urlPictures']+'/PCTV-'+result['urlPictures']+'-vl.jpg'
 		addDir(9, title, search_link, search_img,duration, fold)
 		
     setView('movies', 'movie-view')
+    xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
     			
     		
 def get_seasons():
@@ -259,6 +302,7 @@ def get_seasons():
 		addDir(7, seasons, season_link, season_img, False)
 			
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
 		
 def get_seasons_ep_links():
 	print "get seasons ep links: "+url
@@ -274,7 +318,8 @@ def get_seasons_ep_links():
 			addDir(8, ep_titles, ep_links, ep_images, False)
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
-	setView('episodes', 'episode-view')	
+	setView('episodes', 'episode-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)	
 	
 def get_episodes():
 	print "get_episodes: "+url
@@ -290,6 +335,7 @@ def get_episodes():
 		
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
 	setView('episodes', 'episode-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
 	
 def get_video_url():
     videos = []
@@ -388,7 +434,8 @@ def get_video_url():
 			movie_id = 'IP issue?'
 			dialog.notification("No Video Links available", movie_id, xbmcgui.NOTIFICATION_INFO, 4000)
 
-    setView('movies', 'movie-view')	
+    setView('movies', 'movie-view')
+    xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)	
 		
 def setView(content, viewType):
         
@@ -410,9 +457,6 @@ def addDir(mode,name,url,image,duration="",isplayable=False):
 
 	if 0==mode:
 		link = url
-		# if (quality == 'let me choose'):
-			# print 'name under adddir', name
-			# name = urllib.unquote_plus(name).split(']')[2].split('[')[0]
 		print link
 	else:
 		link = sys.argv[0]+"?mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&url="+urllib.quote_plus(url)+"&image="+urllib.quote_plus(image)
@@ -435,6 +479,8 @@ def addDir(mode,name,url,image,duration="",isplayable=False):
 	if isplayable:
 		item.setProperty('IsPlayable', 'true')
 		isfolder=False
+		# if (quality == 'let me choose'):
+			# name = urllib.unquote_plus(name).split(") ")[1]
 	ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=link,listitem=item,isFolder=isfolder)
 	return ok
 	
@@ -525,6 +571,12 @@ if mode==21:
 	
 if mode==24:
 	get_new_sports()
+	
+if mode==31:
+	get_channels()
+
+if mode==32:
+	get_channel_shows()
 
 s.close()
 	

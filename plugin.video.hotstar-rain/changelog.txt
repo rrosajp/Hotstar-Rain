@@ -31,3 +31,6 @@
 
 [B][COLOR green]V 1.0.9 (Saturday 21 June, 2016)[/COLOR][/B]
 -- [COLOR yellow][B]fixes[/COLOR][/B] fix for tvshows.
+
+[B][COLOR green]v 1.0.10 (Friday, 29 July, 2016)[/COLOR][/B]
+-- [COLOR yellow][B]fixes[/COLOR][/B] fix for search and added channels category.
