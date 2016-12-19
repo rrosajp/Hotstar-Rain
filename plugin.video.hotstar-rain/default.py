@@ -53,21 +53,71 @@ def make_request(url):
 		# print 'url to fetch', url
 		print 'headers are', headers
 		response = s.get(url, headers=headers, cookies=s.cookies, verify=False)
+		print 'cookies under request are', s.cookies.get_dict()
 		data = response.text
 		return data
     except urllib2.URLError, e:    # This is the correct syntax
         print e
         ##sys.exit(1)
 
+def make_request_post():
+	url = 'https://account.hotstar.com/AVS/besc?action=Login&appVersion=5.0.30'
+	username = Addon.getSetting('username')
+	password = Addon.getSetting('password')
+	headers = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36', 'Referer':'http://www.hotstar.com', 'Origin':'http://www.hotstar.com', 'Content-Type':'application/x-www-form-urlencoded'}
+	body = {'username':username, 'password':password, 'channel':'TABLET'}
+	body = urllib.urlencode(body)
+	try:
+		response = s.post(url, headers=headers, data=body, verify=False)
+		# cookieString = ''
+		# c = response.cookies
+		# i = c.items()
+		# for name2, value in i:
+			# cookieString+= name2 + "=" + value + ";"
+		# Addon.setSetting('cookieString', i)
+		# time.sleep(1)
+		return "done"
+	except urllib2.URLError, e:
+		print
+
+def premium_testing():
+	isit = make_request_post()
+	headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding':'gzip, deflate, sdch', 'Connection':'keep-alive', 'User-Agent':'AppleCoreMedia/1.0.0.12B411 (iPhone; U; CPU OS 8_1 like Mac OS X; en_gb)'}
+	# cookieString = Addon.getSetting('cookieString')
+	if isit=="done":
+		html = requests.get('http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=APPLETV&type=VOD&id=1770001366', headers=headers, cookies=s.cookies, verify=False).json()
+		# xbmc.log(html.text)
+		cookieString=''
+		c = s.cookies
+		i = c.items()
+		for name,value in i:
+			cookieString+=name+'='+value+';'
+		raw3_start = html['resultObj']['src']
+		# html2 = requests.get(raw3_start.strip(), headers=headers, cookies=s.cookies, verify=False)
+		# xbmc.log(html2.content)
+		raw3_start2 = raw3_start.strip()
+		raw3_start3 = raw3_start2.replace('variant.m3u8', '3000/1770001366_3000_STAR.m3u8')
+		# html2 = requests.get(raw3_start3, headers=headers, cookies=s.cookies, verify=False)
+		# xbmc.log(html2.content)		
+		high_video = raw3_start3+'|Cookie='+cookieString+'&User-Agent=AppleCoreMedia/1.0.0.12B411 (iPhone; U; CPU OS 8_1 like Mac OS X; en_gb)'
+		xbmc.log('high_video is: '+high_video)
+		
+		listitem =xbmcgui.ListItem('testing')
+		listitem.setPath(high_video)
+		xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
+		
 def new_menu():
 	addDir(21, 'Featured (on main page)', 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId=5637&channel=PCTV','', '')
 	addDir(3, '[B][COLOR orange]Movies[/COLOR][/B]', '', '','')
 	addDir(2, '[B][COLOR white]TV Shows[/COLOR][/B]', '', '','')
-	addDir(5, '[B][COLOR green]Movie Collections[/COLOR][/B]', '','', '')
-	addDir(24, '[B]Sports[/B]', '', '','')
+	# addDir(5, '[B][COLOR green]Movie Collections[/COLOR][/B]', '','', '')
+	addDir(24, '[B][COLOR green]Sports[/COLOR][/B]', '', '','')
 	addDir(31, '[B][COLOR yellow]TV Channels[/COLOR][/B]','','','')
 	addDir(12, '[B]Search[/B]', '', '','')
+	addDir(12, 'Live TV', 'http://search.hotstar.com/AVS/besc?action=SearchContents&appVersion=5.0.28&channel=PCTV&maxResult=99&query=*&searchOrder=counter_day%20desc&type=SHOW_LIVE', '')
+	addDir(12, 'Live Sports', 'http://search.hotstar.com/AVS/besc?action=SearchContents&appVersion=5.0.28&channel=PCTV&maxResult=99&query=*&searchOrder=counter_day%20desc&type=SPORT_LIVE', '')
 	# addDir(30, '[B][COLOR red]Old look (deprecated)[/COLOR][/B]', '','', '')
+	# addDir(51, 'Premium testing', '', '', '', isplayable=True)
 	
 def get_menu():
 	addDir(3, '[B][COLOR orange]Movies[/COLOR](old look)[/B]', '', '','')        
@@ -280,7 +330,7 @@ def get_search():
     for result in html['resultObj']['response']['docs']:
 		title = '[B][COLOR blue]'+result['contentTitle'].encode('ascii','ignore')+'[/COLOR][/B] - '+result['language']
 		duration = result['duration']
-		search_link = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&type=VOD&id='+str(result['contentId'])
+		search_link = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=TABLET&type=VOD&id='+str(result['contentId'])
 		search_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+result['urlPictures']+'/PCTV-'+result['urlPictures']+'-vl.jpg'
 		addDir(9, title, search_link, search_img,duration, fold)
 		
@@ -336,23 +386,104 @@ def get_episodes():
 	xbmcplugin.addSortMethod( handle=int( sys.argv[ 1 ] ), sortMethod=xbmcplugin.SORT_METHOD_LABEL )
 	setView('episodes', 'episode-view')
 	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
+
+
+
+def get_live_video_url():
+	videos = []
+	params = []
+	xbmc.log(url)
+	quality = (Addon.getSetting('qualityType')).lower()
+	html = make_request(url)
+	data = html
+	html = json.loads(data)
+	manifest1 = html['resultObj']['src']
+	xbmc.log('manifest1 is, '+manifest1)
+	
+	# cookieString = ""
+	# c = s.cookies
+	# i = c.items()
+	# for name2, value in i:
+		# cookieString+= name2 + "=" + value + ";"
+	# print 'cookieString is', cookieString
+
+	# high_video = manifest1
+	if enableip=='true':
+		s2 = requests.Session()
+		high_video = manifest1#+"|Cookie="+cookieString+"X-Forwarded-For="+ipaddress+"&Referer=http://www.hotstar.com/fox-news-breaking-news-latest-updates/1000102697&User-Agent=Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36&X-Requested-With=ShockwaveFlash/23.0.0.162"
+		headers = {'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', 'Accept-Encoding':'gzip, deflate, sdch', 'Connection':'keep-alive', 'User-Agent':'AppleCoreMedia/1.0.0.12B411 (iPhone; U; CPU OS 8_1 like Mac OS X; en_gb)', 'X-Forwarded-For': ipaddress}
+		response = s.get(high_video, headers=headers, cookies=s2.cookies, verify=False)
+		# html = make_request(high_video)
+		matchlist2 = re.compile("BANDWIDTH=(\d+)\s+(http.+?m3u8)").findall(response.content)
+		hdnea = s.cookies.get_dict()['hdnea']
+		alid = s.cookies.get_dict()['_alid_']
+		cookieString = ""
+		c = s.cookies
+		i = c.items()
+		for name2, value in i:
+			cookieString+= name2 + "=" + value + ";"
+		print 'cookieString is', cookieString
+		videos=[]
+		if matchlist2:
+				xbmc.log('inside matchlist2 to separate size,video')
+				for (size, video) in matchlist2:
+					if size:
+						size = int(size)
+					else:
+						size = 0
+					videos.append( [size, video] )
+					
+		videos.sort(key=lambda L : L and L[0], reverse=True)
+		
+		# +hdnea+";&"
+		if videos:
+			raw3_start = videos[4][1]
+			high_video = raw3_start+"|Cookie=_alid_="+alid+";hdnea="+hdnea+";&X-Forwarded-For="+ipaddress+"&Referer=http://www.hotstar.com/fox-news-breaking-news-latest-updates/1000102697&User-Agent=Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36&X-Requested-With=ShockwaveFlash/23.0.0.162&Connection=keep-alive&Accept-Encoding=gzip&Range=bytes=0-100000&Icy-MetaData=0"
+			# high_video = raw3_start+"|X-Forwarded-For="+ipaddress+"&Referer=http://www.hotstar.com/fox-news-breaking-news-latest-updates/1000102697&User-Agent=Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36&X-Requested-With=ShockwaveFlash/23.0.0.162&Connection=keep-alive&Accept-Encoding=gzip&Range=&Icy-MetaData="
+			print 'full high_video is', high_video
+	
+	# xbmc.log("cookieString2 is, "+cookieString2)
+	# print "cookieString2 is ", cookieString2
+	
+	# print 's cookies under request are', s.cookies.get_dict()
+	
+	listitem =xbmcgui.ListItem(name)
+	listitem.setPath(high_video)
+	xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
+
+	setView('movies', 'movie-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]))	
+
+
+
+
+
 	
 def get_video_url():
-    videos = []
-    params = []
-    html = make_request(url)
-    data = html
-    html = json.loads(data)
-    manifest1 = html['resultObj']['src']
-    manifest1 = manifest1.replace('http://','https://')
-    manifest1 = manifest1.replace('/z/','/i/')
-    manifest1 = manifest1.replace('manifest.f4m', 'master.m3u8')
-    if (quality=='highest'):
+	videos = []
+	params = []
+	xbmc.log(url)
+	quality = (Addon.getSetting('qualityType')).lower()
+	html = make_request(url)
+	data = html
+	html = json.loads(data)
+	manifest1 = html['resultObj']['src']
+	xbmc.log('manifest1 is, '+manifest1)
+	islive=False
+	if 'TABLET' not in manifest1 and 'master.m3u8' in manifest1:
+		islive=True
+		if (quality!='highest'):
+			quality='let me choose'
+	if 'TABLET' not in manifest1 and 'master.m3u8' not in manifest1:
+		manifest1 = manifest1.replace('http://','https://')
+		manifest1 = manifest1.replace('/z/','/i/')
+		manifest1 = manifest1.replace('manifest.f4m', 'master.m3u8')
+	if (quality=='highest' and '1300,2000' in manifest1):
 		manifest2 = manifest1.replace('1300,2000', '3000,4500')
 		manifest_url = make_request(manifest2)
 		# print manifest_url
 		if 'EXTM3U' in manifest_url:
-			matchlist2 = re.compile("BANDWIDTH=([0-9]+)[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+			matchlist2 = re.compile("x(\d+).+?(http.+?)\n", re.DOTALL).findall(str(manifest_url))
 			manifest1 = None
 			if matchlist2:
 				for (size, video) in matchlist2:
@@ -363,21 +494,20 @@ def get_video_url():
 					videos.append( [size, video] )
 		else:
 			manifest1 = manifest2.replace('3000,4500', '1300,2000')
-    
-    if manifest1:
+
+	if manifest1:
 		manifest_url = make_request(manifest1)
-		print manifest_url
-		if manifest_url:
+		if (manifest_url):
 			if (quality=='highest' or quality=='let me choose'):
-				# matchlist2 = re.compile("BANDWIDTH=([0-9]+).*RESOLUTION[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
-				matchlist2 = re.compile("RESOLUTION=\d+x([0-9]+)[^\n]*\n([^\n]*)\n").findall(str(manifest_url))
+				matchlist2 = re.compile("x(\d+).+?(http.+?)\n", re.DOTALL).findall(str(manifest_url))
 			elif (quality == '720p'):
-				matchlist2 = re.compile("BANDWIDTH=(\d+).*x720[^\n]*\n([^n].*)").findall(str(manifest_url))
+				matchlist2 = re.compile("x(720).+?(http.+?)\n", re.DOTALL).findall(str(manifest_url))
 			elif (quality == '404p'):
-				matchlist2 = re.compile("BANDWIDTH=(\d+).*x404[^\n]*\n([^n].*)").findall(str(manifest_url))
+				matchlist2 = re.compile("x(404).+?(http.+?)\n", re.DOTALL).findall(str(manifest_url))
 			else:
-				matchlist2 = re.compile("BANDWIDTH=(\d+).*x360[^\n]*\n([^n].*)").findall(str(manifest_url))
+				matchlist2 = re.compile("x(360).+?(http.+?)\n", re.DOTALL).findall(str(manifest_url))
 			if matchlist2:
+				xbmc.log('inside matchlist2 to separate size,video')
 				for (size, video) in matchlist2:
 					if size:
 						size = int(size)
@@ -386,16 +516,17 @@ def get_video_url():
 					videos.append( [size, video] )
 		else:
 			videos.append( [-2, match] )
-    
-    videos.sort(key=lambda L : L and L[0], reverse=True)
-    cookieString = ""
-    c = s.cookies
-    i = c.items()
-    for name2, value in i:
-		cookieString+= name2 + "=" + value + ";"
-    # print 'cookieString is', cookieString
+
+	videos.sort(key=lambda L : L and L[0], reverse=True)
 	
-    if (quality == 'let me choose'):
+	cookieString = ""
+	c = s.cookies
+	i = c.items()
+	for name2, value in i:
+		cookieString+= name2 + "=" + value + ";"
+	# print 'cookieString is', cookieString
+
+	if (quality == 'let me choose'):
 		print videos
 		for video in videos:
 			size = '(' + str(video[0]) + 'p) '
@@ -415,11 +546,11 @@ def get_video_url():
 					size = '[COLOR green][720p][/COLOR] '
 					old_vid = video[1]
 					new_vid = video[1].replace('index_1364_av', 'index_2064_av')
-					addDir(0, size + name, new_vid+"|Cookie="+cookieString+"&X-Forwarded-For="+ipaddress, image, isplayable=True)
+					addDir(0, size + name, new_vid+"|Cookie="+cookieString, image, isplayable=True)
 					addDir(0, old_size + name, old_vid+"|Cookie="+cookieString, image, isplayable=True)
 				else:
 					addDir(0, size + name, video[1]+"|Cookie="+cookieString, image, isplayable=True)
-    else:
+	else:
 		if videos:
 			raw3_start = videos[0][1]
 			if enableip=='true':
@@ -434,8 +565,8 @@ def get_video_url():
 			movie_id = 'IP issue?'
 			dialog.notification("No Video Links available", movie_id, xbmcgui.NOTIFICATION_INFO, 4000)
 
-    setView('movies', 'movie-view')
-    xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)	
+	setView('movies', 'movie-view')
+	xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)	
 		
 def setView(content, viewType):
         
@@ -469,7 +600,6 @@ def addDir(mode,name,url,image,duration="",isplayable=False):
 		if '[' in name:
 			name = urllib.unquote_plus(name).split(']')[2].split('[')[0]
 	item.setInfo( type="Video", infoLabels={ "OriginalTitle": name, "Duration": duration } )
-	# print 'printing item', item
 	if 'vl.jpg' in image:
 		image2 = image.replace('vl.jpg', 'hl.jpg')
 		item.setArt({'fanart': image2})
@@ -479,8 +609,6 @@ def addDir(mode,name,url,image,duration="",isplayable=False):
 	if isplayable:
 		item.setProperty('IsPlayable', 'true')
 		isfolder=False
-		# if (quality == 'let me choose'):
-			# name = urllib.unquote_plus(name).split(") ")[1]
 	ok=xbmcplugin.addDirectoryItem(handle=int(sys.argv[1]),url=link,listitem=item,isFolder=isfolder)
 	return ok
 	
@@ -577,6 +705,10 @@ if mode==31:
 
 if mode==32:
 	get_channel_shows()
+
+if mode==41: get_live()
+if mode==42: get_live_video_url()
+if mode==51: premium_testing()
 
 s.close()
 	

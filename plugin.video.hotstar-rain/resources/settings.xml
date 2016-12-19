@@ -9,4 +9,8 @@
 	<setting type="sep" />
 	<setting label="any Indian IP address (http://bit.ly/1LhsHMX)" type="ipaddress" enable="!eq(-2,false)" id="ipaddress" default="0.0.0.0"/>
 	</category>
+	<category label="Premium Login">
+	<setting id="username" type="text" label="Username" default="" />
+    <setting id="password" type="text" option="hidden" label="Password" enable="!eq(-1,)" default="" />	
+	</category>
 </settings>
