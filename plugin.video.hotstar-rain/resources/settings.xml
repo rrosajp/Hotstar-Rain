@@ -8,6 +8,7 @@
 	<setting id="EnableIP" type="bool" label="Enable Indian IP address?" default="false" />
 	<setting type="sep" />
 	<setting label="any Indian IP address (http://bit.ly/1LhsHMX)" type="ipaddress" enable="!eq(-2,false)" id="ipaddress" default="0.0.0.0"/>
+	<setting id="debug" type="bool" label="Enable Debug Mode?" default="false" />
 	</category>
 	<category label="Premium Login">
 	<setting id="username" type="text" label="Username" default="" />
