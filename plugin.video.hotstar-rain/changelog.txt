@@ -1,7 +1,10 @@
-[B][COLOR green]v 1.0.12 (Friday, 29 July, 2016)[/COLOR][/B]
+[B][COLOR green]v 1.0.13 (Friday, 26 December, 2016)[/COLOR][/B]
+-- [COLOR yellow][B]fixes[/COLOR][/B] fix for simple trigger change.
+
+[B][COLOR green]v 1.0.12 (Friday, 24 December, 2016)[/COLOR][/B]
 -- [COLOR yellow][B]fixes[/COLOR][/B] added debug mode under settings. Fix for links, all live sports will auto default to "let me choose" quality option.  Everything else should play with quality selected under addon settings.
 
-[B][COLOR green]v 1.0.11 (Friday, 29 July, 2016)[/COLOR][/B]
+[B][COLOR green]v 1.0.11 (Friday, sometime october, 2016)[/COLOR][/B]
 -- [COLOR yellow][B]fixes[/COLOR][/B] fix for live sports.
 
 

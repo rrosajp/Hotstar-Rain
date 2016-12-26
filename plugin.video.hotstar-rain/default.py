@@ -363,9 +363,9 @@ def get_search():
 		search_link = 'http://getcdn.hotstar.com/AVS/besc?action=GetCDN&asJson=Y&channel=PCTV&type=VOD&id='+str(result['contentId'])
 		search_img = 'http://media0-starag.startv.in/r1/thumbs/PCTV/'+str(result['urlPictures'])[-2:]+'/'+result['urlPictures']+'/PCTV-'+result['urlPictures']+'-vl.jpg'
 		if 'Live' in title:
-			addDir(9, title, search_link, search_img,duration, True)
-		else:
 			addDir(9, title, search_link, search_img,duration, False)
+		else:
+			addDir(9, title, search_link, search_img,duration, True)
 		
     setView('movies', 'movie-view')
     xbmcplugin.endOfDirectory(int(sys.argv[1]), cacheToDisc=True)
