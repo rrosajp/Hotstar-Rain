@@ -1,6 +1,18 @@
 <settings>
+	
+	<!--setting id="langType" type="multiselect" label="Select Language" values="Hindi|English|Kannada|Tamil|Telugu|Malayalam|Marathi|Bengali" default="Hindi"/-->
+	<category label="Language Selection">
+	<setting id="langHindi" type="bool" label="Hindi?" default="true" />
+	<setting id="langEnglish" type="bool" label="English?" default="false" />
+	<setting id="langMalayalam" type="bool" label="Malayalam?" default="false" />
+	<setting id="langTamil" type="bool" label="Tamil?" default="false" />
+	<setting id="langBengali" type="bool" label="Bengali?" default="false" />
+	<setting id="langTelugu" type="bool" label="Telugu?" default="false" />
+	<setting id="langMarathi" type="bool" label="Marathi?" default="false" />
+	<setting id="langKannada" type="bool" label="Kannada?" default="false" />
+	<setting id="langGujarati" type="bool" label="Gujarati?" default="false" />
+	</category>
 	<category label="Options">
-	<setting id="langType" type="labelenum" label="Select Language" values="Hindi|English|Kannada|Tamil|Telugu|Malayalam|Marathi|Bengali" default="Hindi"/>
 	<setting id="tvsortType" type="labelenum" label="TV Shows sorting by" values="Default|Name" default="Default" />
 	<setting id="moviessortType" type="labelenum" label="Movies sorting by" values="Name|Newest|Popularity" default="Newest" />
 	<setting id="qualityType" type="labelenum" label="Video Quality Selection" values="Highest|720p|404p|360p|Let me Choose" default="720p"/>

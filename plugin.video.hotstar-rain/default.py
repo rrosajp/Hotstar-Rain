@@ -17,7 +17,46 @@ Addon = xbmcaddon.Addon(addon_id)
 addon_version = Addon.getAddonInfo('version')
 debug = Addon.getSetting('debug')
 
-language = (Addon.getSetting('langType')).lower()
+# language = (Addon.getSetting('langType')).lower()
+langTypes=''
+langHindi = (Addon.getSetting('langHindi'))
+langEnglish = (Addon.getSetting('langEnglish'))
+langMalayalam = (Addon.getSetting('langMalayalam'))
+langTamil = (Addon.getSetting('langTamil'))
+langBengali = (Addon.getSetting('langBengali'))
+langTelugu = (Addon.getSetting('langTelugu'))
+langMarathi = (Addon.getSetting('langMarathi'))
+langKannada = (Addon.getSetting('langKannada'))
+langGujarati = (Addon.getSetting('langGujarati'))
+if langHindi!='false': 
+	if langTypes!='': langTypes+=',hindi' 
+	else: langTypes+='hindi'
+if langEnglish!='false': 
+	if langTypes!='': langTypes+=',english' 
+	else: langTypes+='english'
+if langMalayalam !='false': 
+	if langTypes!='': langTypes+=',malayalam' 
+	else: langTypes+='malayalam'
+if langTamil!='false': 
+	if langTypes!='': langTypes+=',tamil' 
+	else: langTypes+='tamil'
+if langBengali!='false': 
+	if langTypes!='': langTypes+=',bengali' 
+	else: langTypes+='bengali'
+if langTelugu !='false': 
+	if langTypes!='': langTypes+=',telugu' 
+	else: langTypes+='telugu'
+if langMarathi!='false': 
+	if langTypes!='': langTypes+=',marathi' 
+	else: langTypes+='marathi'
+if langKannada!='false': 
+	if langTypes!='': langTypes+=',kannada' 
+	else: langTypes+='kannada'
+if langGujarati !='false': 
+	if langTypes!='': langTypes+=',gujarati' 
+	else: langTypes+='gujarati'
+	
+language=langTypes	
 perpage = (Addon.getSetting('perPage'))
 moviessortType = (Addon.getSetting('moviessortType')).lower()
 enableip = (Addon.getSetting('EnableIP'))
@@ -136,6 +175,7 @@ def premium_testing():
 		xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, listitem)
 		
 def new_menu():
+	addon_log('selected langs are '+langTypes)
 	changes()
 	addDir(21, 'Featured (on main page)', 'http://account.hotstar.com/AVS/besc?action=GetArrayContentList&categoryId=5637&channel=PCTV','', '')
 	addDir(3, '[B][COLOR orange]Movies[/COLOR][/B]', '', '','')

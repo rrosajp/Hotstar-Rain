@@ -1,7 +1,10 @@
-[B][COLOR green]v 1.0.13 (Friday, 26 December, 2016)[/COLOR][/B]
+[B][COLOR green]v 1.0.14 (Thursday, 29 December, 2016)[/COLOR][/B]
+-- [COLOR yellow][B]Addition[/COLOR][/B] Added multi language selection option under settings.  [COLOR red]PLEASE NOTE, [/COLOR]current default language is probably set back to hindi and you'll need to go back to settings to change to your language.  If none of the language are selected then its considered as ALL and results will be in all languages.
+
+[B][COLOR green]v 1.0.13 (Monday, 26 December, 2016)[/COLOR][/B]
 -- [COLOR yellow][B]fixes[/COLOR][/B] fix for simple trigger change.
 
-[B][COLOR green]v 1.0.12 (Friday, 24 December, 2016)[/COLOR][/B]
+[B][COLOR green]v 1.0.12 (Saturday, 24 December, 2016)[/COLOR][/B]
 -- [COLOR yellow][B]fixes[/COLOR][/B] added debug mode under settings. Fix for links, all live sports will auto default to "let me choose" quality option.  Everything else should play with quality selected under addon settings.
 
 [B][COLOR green]v 1.0.11 (Friday, sometime october, 2016)[/COLOR][/B]
