@@ -1,3 +1,6 @@
+[B][COLOR green]v 1.0.15 (Thursday, 26 January, 2018)[/COLOR][/B]
+-- added fixed playback changes, thanks Gujal.
+
 [B][COLOR green]v 1.0.14 (Thursday, 29 December, 2016)[/COLOR][/B]
 -- [COLOR yellow][B]Addition[/COLOR][/B] Added multi language selection option under settings.  [COLOR red]PLEASE NOTE, [/COLOR]current default language is probably set back to hindi and you'll need to go back to settings to change to your language.  If none of the language are selected then its considered as ALL and results will be in all languages.
 
